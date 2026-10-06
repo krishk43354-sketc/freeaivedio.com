@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Krish - The Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&family=Hanken+Grotesk:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            width: 100%;
+            margin: 0;
+            background-color: #ffffff;
+            font-family: 'Hanken Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* 1000vh creates the long scroll timeline for all events */
+        #spacer {
+            min-height: 1000vh; 
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Initial Overlay */
+        #overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            transition: opacity 0.5s ease-out;
+        }
+        .bodoni { font-family: 'Bodoni Moda', serif; }
+        .hanken { font-family: 'Hanken Grotesk', sans-serif; }
+        .kicker {
+            color: #0f382c;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: 24px;
+        }
+        .headline {
+            color: #121313;
+            opacity: 0.06;
+            font-size: 72px;
+            line-height: 80px;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        /* Scroll Prompts */
+        .prompt-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            transition: opacity 0.4s, transform 0.4s;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .scroll-prompt-text {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        #watermelon-prompt .scroll-prompt-text { color: #0f382c; }
+        #orange-prompt .scroll-prompt-text { color: #e65100; }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(8px); opacity: 1; }
+        }
+
+        /* Master Krish Giant Reveal Text */
+        #masterkrish-giant {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8vw;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: #ff1a48;
+            text-shadow: 0px 8px 32px rgba(255, 26, 72, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+            text-align: center;
+        }
+
+        /* =========================================
+           PROFESSIONAL LIGHT/WHITE PROFILE SECTION 
+           ========================================= */
+        #profile-section {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            overflow: hidden;
+        }
+
+        #profile-bg {
+            position: absolute;
+            inset: 0;
+            background: #f8fafc;
+            z-index: -1;
+        }
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            opacity: 0.8;
+        }
+
+        /* AI Glowing Blobs */
+        .glow-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: blobFloat 10s infinite alternate;
+        }
+        .blob-1 { width: 400px; height: 400px; background: #e0e7ff; top: -100px; left: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #fce7f3; bottom: -200px; right: -100px; animation-delay: -2s; }
+        .blob-3 { width: 300px; height: 300px; background: #dcfce7; top: 40%; left: 60%; animation-delay: -5s; }
+
+        @keyframes blobFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        .profile-center {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .main-img-wrapper {
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 24px auto;
+            border-radius: 50%;
+            padding: 8px;
+            background: linear-gradient(135deg, #fff, #f1f5f9);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08), inset 0 2px 4px rgba(255,255,255,0.8);
+            position: relative;
+        }
+        .main-img-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #ec4899, #eab308);
+            z-index: -1;
+            animation: spinGrad 4s linear infinite;
+        }
+        @keyframes spinGrad {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Pulsing Rings */
+        .ring {
+            position: absolute;
+            inset: -10px;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: 50%;
+            animation: ringPing 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .ring-2 {
+            inset: -20px;
+            border-color: rgba(236, 72, 153, 0.3);
+            animation-delay: 1.5s;
+        }
+        @keyframes ringPing {
+            75%, 100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 48px;
+            margin: 0 0 8px 0;
+            letter-spacing: 0.1em;
+        }
+        .text-subtitle {
+            color: #64748b;
+            font-size: 16px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Floating Qualification Cards */
+        .cards-wrapper {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        @keyframes borderPulse {
+            0%, 100% { border-color: rgba(255,255,255,1); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
+            50% { border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 25px 45px rgba(99, 102, 241, 0.15); }
+        }
+        .float-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,1);
+            padding: 10px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 200px;
+            z-index: 3;
+            animation: floatCardAnim 6s ease-in-out infinite, borderPulse 4s infinite;
+            pointer-events: auto;
+            transition: transform 0.3s ease;
+        }
+        .float-card:hover { transform: translateY(-10px) scale(1.05) !important; }
+        @keyframes floatCardAnim {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .card-img-wrap {
+            width: 100%;
+            height: 120px;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .float-card:hover .card-img-wrap img { transform: scale(1.1); }
+        
+        .float-text {
+            font-size: 13px;
+            color: #475569;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-bottom: 4px;
+        }
+
+        /* Desktop Positioning */
+        .float-1 { top: 15%; left: 10%; animation-delay: 0s, 0s; }
+        .float-2 { top: 60%; left: 15%; animation-delay: -1.5s, -1s; }
+        .float-3 { top: 20%; right: 10%; animation-delay: -3s, -2s; }
+        .float-4 { top: 65%; right: 15%; animation-delay: -4.5s, -3s; }
+
+        /* Orange Section White Background */
+        #orange-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            background: #ffffff; /* Clean White Background */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        /* =========================================
+           CINEMATIC FULL-SCREEN VIDEO SECTION
+           ========================================= */
+        #cinematic-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 150;
+            opacity: 0;
+            pointer-events: none;
+            background: #000;
+            overflow: hidden;
+        }
+        #cinematic-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-origin: center center;
+        }
+
+        /* THE END Screen */
+        #the-end {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8vw;
+            color: #111;
+            letter-spacing: 0.3em;
+            background: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .headline { font-size: 44px; line-height: 52px; }
+            #masterkrish-giant { font-size: 10vw; letter-spacing: 0.1em; }
+            
+            #profile-section {
+                flex-direction: column;
+                justify-content: flex-start;
+                padding: 60px 20px;
+                overflow-y: auto;
+            }
+            .profile-center { margin-bottom: 40px; }
+            .main-img-wrapper { width: 180px; height: 180px; }
+            .gradient-text { font-size: 32px; }
+            
+            .cards-wrapper {
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 16px;
+                pointer-events: auto;
+            }
+            .float-card {
+                position: relative;
+                width: 150px;
+                top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+                animation: none; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Watermelon Start Overlay -->
+    <div id="overlay">
+        <div class="kicker hanken">Atelier Pristine</div>
+        <div class="headline bodoni" id="headline">Citrullus<br>Lanatus</div>
+    </div>
+
+    <!-- Watermelon Scroll Prompt -->
+    <div id="watermelon-prompt" class="prompt-container">
+        <div class="scroll-prompt-text hanken">Scroll to explore</div>
+    </div>
+
+    <!-- Master Krish Giant Text -->
+    <div id="masterkrish-giant" class="bodoni">MASTER KRISH</div>
+
+    <!-- Professional Profile Section -->
+    <div id="profile-section">
+        <div id="profile-bg">
+            <div class="grid-overlay"></div>
+            <div class="glow-blob blob-1"></div>
+            <div class="glow-blob blob-2"></div>
+            <div class="glow-blob blob-3"></div>
+        </div>
+        
+        <div class="profile-center">
+            <div class="main-img-wrapper">
+                <img src="g.png" alt="Master Krish" onerror="this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop'">
+                <div class="ring ring-1"></div>
+                <div class="ring ring-2"></div>
+            </div>
+            <h1 class="bodoni gradient-text">MASTER KRISH</h1>
+            <p class="hanken text-subtitle">Visionary • Creator • Leader</p>
+        </div>
+
+        <div class="cards-wrapper">
+            <div class="float-card float-1">
+                <div class="card-img-wrap">
+                    <img src="student.jpg" alt="Student" onerror="this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=200&auto=format&fit=crop'">
+                </div>
+                <div class="float-text hanken">Class 9th Student</div>
+            </div>
+            <div class="float-card float-2">
+                <div class="card-img-wrap">
+                    <img src="entrepreneur.jpg" alt="Entrepreneur" onerror="this.src='https://images.unsplash.com/photo-1556761175-5973dc0f32d7?q=80&w=200&auto=format&fit=crop'">
+                </div>
+                <div class="float-text hanken">Entrepreneur</div>
+            </div>
+            <div class="float-card float-3">
+                <div class="card-img-wrap">
+                    <img src="speaker.jpg" alt="Public Speaker" onerror="this.src='https://images.unsplash.com/photo-1475721028070-128a30752538?q=80&w=200&auto=format&fit=crop'">
+                </div>
+                <div class="float-text hanken">Public Speaker</div>
+            </div>
+            <div class="float-card float-4">
+                <div class="card-img-wrap">
+                    <img src="innovator.jpg" alt="Innovator" onerror="this.src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=200&auto=format&fit=crop'">
+                </div>
+                <div class="float-text hanken">Innovator</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orange Background & Prompt (Now Pure White) -->
+    <div id="orange-bg"></div>
+    <div id="orange-prompt" class="prompt-container">
+        <div class="scroll-prompt-text hanken">Scroll to explore</div>
+    </div>
+
+    <!-- Cinematic Full Screen Video -->
+    <div id="cinematic-video">
+        <video autoplay loop muted playsinline>
+            <!-- User's Exact File Path -->
+            <source src="file:///D:/Amit%20work/Stock%20video/Clouds/4066718-hd_1280_720_30fps.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- THE END -->
+    <div id="the-end" class="bodoni">THE END</div>
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container"></div>
+    <div id="spacer"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            function hasWebGL() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+                } catch (e) { return false; }
+            }
+            if (!hasWebGL()) {
+                document.getElementById('canvas-container').style.display = 'none';
+                return;
+            }
+
+            // Globals & Constants
+            let scrollProgress = 0;
+            let targetScrollProgress = 0;
+            let mouseX = 0, mouseY = 0;
+            let targetMouseX = 0, targetMouseY = 0;
+            let hoverDist = 0, targetHoverDist = 0;
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isTouch = window.matchMedia('(hover: none)').matches;
+            const _v = new THREE.Vector3();
+            let seedVal = 12345;
+            const frameTimes = [];
+
+            const DAMPING_K = 5.0;
+            const HOVER_RADIUS = 0.65;
+            const BURST_EXPONENT = 1.25;
+
+            function random() {
+                seedVal = (seedVal * 9301 + 49297) % 233280;
+                return seedVal / 233280;
+            }
+
+            // Three.js Setup
+            const container = document.getElementById('canvas-container');
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
+            renderer.setClearColor(0xffffff, 0);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.15;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 8.5);
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+            const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+            keyLight.position.set(6, 9, 7);
+            keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 1024;
+            keyLight.shadow.mapSize.height = 1024;
+            keyLight.shadow.camera.near = 0.5;
+            keyLight.shadow.camera.far = 25;
+            keyLight.shadow.bias = -0.001;
+            scene.add(keyLight);
+
+            const rimLight = new THREE.DirectionalLight(0xe8fbf5, 1.2);
+            rimLight.position.set(-6, 4, -4);
+            scene.add(rimLight);
+
+            const shineLight = new THREE.PointLight(0xffffff, 0, 14);
+            scene.add(shineLight);
+
+            // ==========================================
+            // WATERMELON GENERATION
+            // ==========================================
+            const RADIUS_W = 2.15;
+            const NUM_WEDGES_W = 8;
+            const ANGLE_SPAN_W = (Math.PI * 2) / NUM_WEDGES_W;
+            const watermelonGroup = new THREE.Group();
+            scene.add(watermelonGroup);
+
+            const rindCanvasW = document.createElement('canvas');
+            rindCanvasW.width = 2048; rindCanvasW.height = 1024;
+            const ctxRW = rindCanvasW.getContext('2d');
+            const gradRW = ctxRW.createLinearGradient(0, 0, 0, 1024);
+            gradRW.addColorStop(0, '#388e3c'); gradRW.addColorStop(0.5, '#4caf50'); gradRW.addColorStop(1, '#2e7d32');
+            ctxRW.fillStyle = gradRW; ctxRW.fillRect(0, 0, 2048, 1024);
+            for (let i = 0; i < 8000; i++) {
+                ctxRW.fillStyle = i % 2 === 0 ? 'rgba(129,199,132,0.15)' : 'rgba(27,94,32,0.15)';
+                ctxRW.beginPath(); ctxRW.arc(Math.random() * 2048, Math.random() * 1024, 0.5 + Math.random() * 2.5, 0, Math.PI * 2); ctxRW.fill();
+            }
+            ctxRW.fillStyle = '#0f3a15';
+            for (let i = 0; i < 20; i++) {
+                const baseX = (i / 20) * 2048;
+                ctxRW.beginPath();
+                for (let y = 0; y <= 1024; y += 15) {
+                    const offset = Math.sin(y * 0.035 + i * 2.8) * 22 + Math.cos(y * 0.08 + i * 1.5) * 10 + Math.sin(y * 0.2 + i * 3) * 4;
+                    ctxRW.lineTo(baseX + offset, y);
+                }
+                for (let y = 1024; y >= 0; y -= 15) {
+                    const offset = Math.sin(y * 0.035 + i * 2.8) * 22 + Math.cos(y * 0.08 + i * 1.5) * 10 + Math.sin(y * 0.2 + i * 3) * 4;
+                    ctxRW.lineTo(baseX + 48 + offset, y);
+                }
+                ctxRW.fill();
+            }
+            const rindTexW = new THREE.CanvasTexture(rindCanvasW);
+            rindTexW.wrapS = THREE.RepeatWrapping; rindTexW.wrapT = THREE.ClampToEdge;
+            rindTexW.encoding = THREE.sRGBEncoding;
+
+            const fleshCanvasW = document.createElement('canvas');
+            fleshCanvasW.width = 512; fleshCanvasW.height = 512;
+            const ctxFW = fleshCanvasW.getContext('2d');
+            const gradFW = ctxFW.createRadialGradient(256, 256, 0, 256, 256, 256);
+            gradFW.addColorStop(0, '#ff1a48'); gradFW.addColorStop(0.75, '#f51142'); 
+            gradFW.addColorStop(0.96, '#ffcdd2'); gradFW.addColorStop(1, '#f4fbf4');
+            ctxFW.fillStyle = gradFW; ctxFW.fillRect(0, 0, 512, 512);
+            for (let i = 0; i < 3500; i++) {
+                ctxFW.fillStyle = Math.random() < 0.6 ? 'rgba(255,255,255,0.22)' : 'rgba(180,0,30,0.18)';
+                const r = Math.random() * 245, a = Math.random() * Math.PI * 2;
+                ctxFW.beginPath(); ctxFW.arc(256 + Math.cos(a)*r, 256 + Math.sin(a)*r, 1 + Math.random()*2, 0, Math.PI*2); ctxFW.fill();
+            }
+            const fleshTexW = new THREE.CanvasTexture(fleshCanvasW);
+            fleshTexW.encoding = THREE.sRGBEncoding;
+
+            const rindMatW = new THREE.MeshPhongMaterial({ map: rindTexW, shininess: 95, specular: new THREE.Color(0xc8ffc8), side: THREE.DoubleSide });
+            const fleshMatW = new THREE.MeshPhongMaterial({ map: fleshTexW, color: 0xff1e46, shininess: 110, specular: new THREE.Color(0xffffff), side: THREE.DoubleSide });
+            
+            const seedGeoW = new THREE.ConeGeometry(0.045, 0.14, 10); seedGeoW.scale(1, 1, 0.32);
+            const seedMatW = new THREE.MeshPhongMaterial({ color: 0x0a0a0a, shininess: 160, specular: 0xffffff });
+            
+            const faceGeoW = new THREE.CircleGeometry(RADIUS_W, 32, -Math.PI / 2, Math.PI);
+            const wedgesW = [];
+            for (let w = 0; w < NUM_WEDGES_W; w++) {
+                const group = new THREE.Group();
+                const startAngle = w * ANGLE_SPAN_W;
+                
+                const rindMesh = new THREE.Mesh(new THREE.SphereGeometry(RADIUS_W, 40, 32, startAngle + Math.PI, ANGLE_SPAN_W, 0, Math.PI), rindMatW);
+                rindMesh.castShadow = true; rindMesh.receiveShadow = true; group.add(rindMesh);
+                
+                const face1 = new THREE.Mesh(faceGeoW, fleshMatW);
+                face1.rotation.y = startAngle; face1.castShadow = true; face1.receiveShadow = true; group.add(face1);
+                
+                const face2 = new THREE.Mesh(faceGeoW, fleshMatW);
+                face2.rotation.y = startAngle + ANGLE_SPAN_W + Math.PI; face2.castShadow = true; face2.receiveShadow = true; group.add(face2);
+                
+                for (let s = 0; s < 5; s++) {
+                    const smesh = new THREE.Mesh(seedGeoW, seedMatW);
+                    const rDist = 0.55 + s * 0.28;
+                    const sAngle = startAngle + ANGLE_SPAN_W * 0.28; 
+                    smesh.position.set(Math.cos(sAngle)*rDist, (random()*1.7-0.85), -Math.sin(sAngle)*rDist);
+                    smesh.rotation.set(random()*Math.PI, random()*Math.PI, random()*Math.PI);
+                    group.add(smesh);
+                }
+                
+                const midAngle = startAngle + ANGLE_SPAN_W / 2;
+                wedgesW.push({
+                    mesh: group,
+                    burstDir: new THREE.Vector3(Math.cos(midAngle)*1.1, (w%2===0?0.7:-0.7)+(random()*0.35-0.175), -Math.sin(midAngle)*1.1).normalize(),
+                    rotAxis: new THREE.Vector3(random()*2.8-1.4, random()*2.8-1.4, random()*2.8-1.4)
+                });
+                watermelonGroup.add(group);
+            }
+
+            const particlesW = [];
+            for (let i = 0; i < 50; i++) {
+                const isJuice = random() < 0.65;
+                let mesh;
+                if (isJuice) {
+                    mesh = new THREE.Mesh(new THREE.SphereGeometry(0.045 + random() * 0.035, 8, 8), new THREE.MeshPhongMaterial({color: 0xff1744, opacity: 0.9, transparent: true}));
+                } else {
+                    mesh = new THREE.Mesh(seedGeoW, seedMatW);
+                }
+                mesh.visible = false; watermelonGroup.add(mesh);
+                particlesW.push({ mesh, dir: new THREE.Vector3(random()*2-1, random()*1.5-0.5, random()*2-1).normalize(), speed: 3.8+random()*4.8, rotSpeed: new THREE.Vector3(random()*6-3, random()*6-3, random()*6-3), isJuice });
+            }
+
+            // ==========================================
+            // ORANGE GENERATION
+            // ==========================================
+            const RADIUS_O = 1.9;
+            const NUM_WEDGES_O = 10;
+            const ANGLE_SPAN_O = (Math.PI * 2) / NUM_WEDGES_O;
+            const orangeGroup = new THREE.Group();
+            orangeGroup.visible = false;
+            scene.add(orangeGroup);
+
+            const rindCanvasO = document.createElement('canvas');
+            rindCanvasO.width = 1024; rindCanvasO.height = 1024;
+            const ctxRO = rindCanvasO.getContext('2d');
+            ctxRO.fillStyle = '#f57c00'; ctxRO.fillRect(0, 0, 1024, 1024);
+            for (let i = 0; i < 60000; i++) {
+                ctxRO.fillStyle = Math.random() < 0.5 ? 'rgba(255,152,0,0.3)' : 'rgba(230,81,0,0.4)';
+                ctxRO.beginPath(); ctxRO.arc(Math.random()*1024, Math.random()*1024, Math.random()*1.5, 0, Math.PI*2); ctxRO.fill();
+            }
+            for (let i = 0; i < 20000; i++) {
+                ctxRO.fillStyle = 'rgba(216,67,21,0.4)';
+                ctxRO.beginPath(); ctxRO.arc(Math.random()*1024, Math.random()*1024, Math.random()*0.8, 0, Math.PI*2); ctxRO.fill();
+            }
+            const rindTexO = new THREE.CanvasTexture(rindCanvasO);
+            rindTexO.wrapS = THREE.RepeatWrapping; rindTexO.wrapT = THREE.ClampToEdge;
+
+            const fleshCanvasO = document.createElement('canvas');
+            fleshCanvasO.width = 512; fleshCanvasO.height = 512;
+            const ctxFO = fleshCanvasO.getContext('2d');
+            const gradFO = ctxFO.createRadialGradient(256, 256, 0, 256, 256, 256);
+            gradFO.addColorStop(0, '#ffffff'); gradFO.addColorStop(0.08, '#ffe0b2');
+            gradFO.addColorStop(0.2, '#ff9800'); gradFO.addColorStop(0.85, '#f57c00');
+            gradFO.addColorStop(0.92, '#ffffff'); gradFO.addColorStop(1, '#ffffff');
+            ctxFO.fillStyle = gradFO; ctxFO.fillRect(0, 0, 512, 512);
+            ctxFO.lineWidth = 1.0;
+            for(let i=0; i<180; i++) {
+                ctxFO.strokeStyle = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 204, 128, 0.3)';
+                ctxFO.beginPath(); const ang = Math.random() * Math.PI * 2;
+                const rLStart = 20 + Math.random() * 20, rLEnd = 200 + Math.random() * 35;
+                ctxFO.moveTo(256 + Math.cos(ang)*rLStart, 256 + Math.sin(ang)*rLStart);
+                ctxFO.lineTo(256 + Math.cos(ang)*rLEnd, 256 + Math.sin(ang)*rLEnd); ctxFO.stroke();
+            }
+            ctxFO.lineWidth = 3; ctxFO.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            for(let i=0; i<10; i++) {
+                const ang = (i / 10) * Math.PI * 2;
+                ctxFO.beginPath(); ctxFO.moveTo(256, 256); ctxFO.lineTo(256 + Math.cos(ang)*240, 256 + Math.sin(ang)*240); ctxFO.stroke();
+            }
+            const fleshTexO = new THREE.CanvasTexture(fleshCanvasO);
+
+            const rindMatO = new THREE.MeshPhongMaterial({ map: rindTexO, shininess: 40, specular: new THREE.Color(0xffcc80), side: THREE.DoubleSide });
+            const fleshMatO = new THREE.MeshPhongMaterial({ map: fleshTexO, color: 0xffffff, shininess: 80, specular: new THREE.Color(0xffffff), side: THREE.DoubleSide });
+            const seedGeoO = new THREE.ConeGeometry(0.03, 0.1, 8); seedGeoO.scale(1, 1, 0.4);
+            const seedMatO = new THREE.MeshPhongMaterial({ color: 0xfafafa, shininess: 100 });
+            
+            const faceGeoO = new THREE.CircleGeometry(RADIUS_O, 32, -Math.PI / 2, Math.PI);
+            const wedgesO = [];
+            for (let w = 0; w < NUM_WEDGES_O; w++) {
+                const group = new THREE.Group();
+                const startAngle = w * ANGLE_SPAN_O;
+                
+                const rindMesh = new THREE.Mesh(new THREE.SphereGeometry(RADIUS_O, 40, 32, startAngle + Math.PI, ANGLE_SPAN_O, 0, Math.PI), rindMatO);
+                rindMesh.castShadow = true; rindMesh.receiveShadow = true; group.add(rindMesh);
+                
+                const face1 = new THREE.Mesh(faceGeoO, fleshMatO);
+                face1.rotation.y = startAngle; face1.castShadow = true; face1.receiveShadow = true; group.add(face1);
+                
+                const face2 = new THREE.Mesh(faceGeoO, fleshMatO);
+                face2.rotation.y = startAngle + ANGLE_SPAN_O + Math.PI; face2.castShadow = true; face2.receiveShadow = true; group.add(face2);
+                
+                for (let s = 0; s < 4; s++) {
+                    const smesh = new THREE.Mesh(seedGeoO, seedMatO);
+                    const rDist = 0.4 + s * 0.3; const sAngle = startAngle + ANGLE_SPAN_O * 0.5 + (random()*0.1 - 0.05); 
+                    smesh.position.set(Math.cos(sAngle)*rDist, (random()*1.5-0.75), -Math.sin(sAngle)*rDist);
+                    smesh.rotation.set(random()*Math.PI, random()*Math.PI, random()*Math.PI); group.add(smesh);
+                }
+                
+                const midAngle = startAngle + ANGLE_SPAN_O / 2;
+                wedgesO.push({
+                    mesh: group,
+                    burstDir: new THREE.Vector3(Math.cos(midAngle)*1.1, (w%2===0?0.5:-0.5)+(random()*0.4-0.2), -Math.sin(midAngle)*1.1).normalize(),
+                    rotAxis: new THREE.Vector3(random()*2-1, random()*2-1, random()*2-1)
+                });
+                orangeGroup.add(group);
+            }
+
+            const particlesO = [];
+            for (let i = 0; i < 40; i++) {
+                const isJuice = random() < 0.8;
+                let mesh;
+                if (isJuice) {
+                    mesh = new THREE.Mesh(new THREE.SphereGeometry(0.04 + random()*0.03, 8, 8), new THREE.MeshPhongMaterial({color: 0xffa726, opacity: 0.9, transparent: true}));
+                } else {
+                    mesh = new THREE.Mesh(seedGeoO, seedMatO);
+                }
+                mesh.visible = false; orangeGroup.add(mesh);
+                particlesO.push({ mesh, dir: new THREE.Vector3(random()*2-1, random()*1.5-0.5, random()*2-1).normalize(), speed: 3.8+random()*4.8, rotSpeed: new THREE.Vector3(random()*6-3, random()*6-3, random()*6-3), isJuice });
+            }
+
+            // Events
+            const resizeObserver = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    camera.aspect = width / height;
+                    if (camera.aspect < 0.8) camera.position.z = 8.5 + (0.8 - camera.aspect) * 6;
+                    else camera.position.z = 8.5;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(width, height);
+                }
+            });
+            resizeObserver.observe(container);
+
+            window.addEventListener('scroll', () => {
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                targetScrollProgress = maxScroll > 0 ? Math.max(0, Math.min(1, window.scrollY / maxScroll)) : 0;
+            }, { passive: true });
+
+            window.addEventListener('pointermove', (e) => {
+                targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+                const dist = Math.hypot(targetMouseX, targetMouseY);
+                targetHoverDist = dist < HOVER_RADIUS ? 1 : Math.max(0, 1 - (dist - HOVER_RADIUS) * 2.5);
+            }, { passive: true });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            
+            // DOM Elements
+            const overlay = document.getElementById('overlay');
+            const wp = document.getElementById('watermelon-prompt');
+            const op = document.getElementById('orange-prompt');
+            const mkGiant = document.getElementById('masterkrish-giant');
+            const profSec = document.getElementById('profile-section');
+            const orgBg = document.getElementById('orange-bg');
+            const theEnd = document.getElementById('the-end');
+            const cinVideo = document.getElementById('cinematic-video');
+
+            function animate() {
+                if (document.hidden) { requestAnimationFrame(animate); return; }
+                const dt = Math.min(clock.getDelta(), 0.1);
+                const time = clock.getElapsedTime();
+                
+                if (isTouch) {
+                    targetMouseX = Math.sin(time * 0.8) * 0.6; targetMouseY = Math.cos(time * 0.5) * 0.6; targetHoverDist = 1;
+                }
+                
+                mouseX += (targetMouseX - mouseX) * (1 - Math.exp(-DAMPING_K * dt));
+                mouseY += (targetMouseY - mouseY) * (1 - Math.exp(-DAMPING_K * dt));
+                hoverDist += (targetHoverDist - hoverDist) * (1 - Math.exp(-DAMPING_K * dt));
+                scrollProgress += (targetScrollProgress - scrollProgress) * (1 - Math.exp(-DAMPING_K * dt));
+                
+                shineLight.position.set(mouseX * 5.5, mouseY * 5.5, 5);
+                shineLight.intensity = hoverDist * 4.0;
+                
+                rindMatW.shininess = 95 + hoverDist * 110;
+                rindMatW.specular.setRGB(0.7 + hoverDist*0.3, 1.0, 0.8 + hoverDist*0.2);
+                
+                const floatOffset = prefersReducedMotion ? 0 : Math.sin(time * 1.6) * 0.12;
+
+                // Toggle Models
+                if (scrollProgress < 0.4) {
+                    watermelonGroup.visible = true;
+                    orangeGroup.visible = false;
+                    keyLight.color.setHex(0xffffff);
+                    rimLight.color.setHex(0xe8fbf5);
+                } else {
+                    watermelonGroup.visible = false;
+                    orangeGroup.visible = true;
+                    keyLight.color.setHex(0xffffff); // Kept crisp white for the orange section
+                    rimLight.color.setHex(0xe8fbf5); // Cool white rim
+                }
+
+                // Canvas Opacity Fade In/Out
+                let cAlpha = 0;
+                if (scrollProgress < 0.20) cAlpha = 1;
+                else if (scrollProgress < 0.25) cAlpha = 1 - (scrollProgress - 0.20) * 20;
+                else if (scrollProgress < 0.55) cAlpha = 0;
+                else if (scrollProgress < 0.60) cAlpha = (scrollProgress - 0.55) * 20;
+                else if (scrollProgress < 0.80) cAlpha = 1;
+                else if (scrollProgress < 0.85) cAlpha = 1 - (scrollProgress - 0.80) * 20;
+                container.style.opacity = Math.max(0, Math.min(1, cAlpha));
+
+                // Update Watermelon (Burst mapped 0 to 0.2)
+                if (watermelonGroup.visible) {
+                    const bProg = Math.min(1, scrollProgress / 0.20);
+                    let burstF = Math.pow(bProg, BURST_EXPONENT) * 5.8;
+                    if (prefersReducedMotion) burstF *= 0.5;
+
+                    if (!prefersReducedMotion) {
+                        watermelonGroup.position.x = mouseX * 0.35;
+                        watermelonGroup.position.y = floatOffset + mouseY * 0.35;
+                        watermelonGroup.rotation.y = time * 0.3 + mouseX * 0.7;
+                        watermelonGroup.rotation.x = Math.sin(time*0.7)*0.08 - mouseY*0.5;
+                    }
+                    for (let w = 0; w < NUM_WEDGES_W; w++) {
+                        const wedge = wedgesW[w];
+                        wedge.mesh.position.copy(wedge.burstDir).multiplyScalar(burstF);
+                        wedge.mesh.rotation.set(wedge.rotAxis.x*bProg*3.2, wedge.rotAxis.y*bProg*3.2, wedge.rotAxis.z*bProg*3.2);
+                    }
+                    for (let i = 0; i < particlesW.length; i++) {
+                        const p = particlesW[i];
+                        if (bProg < 0.03) p.mesh.visible = false;
+                        else {
+                            p.mesh.visible = true;
+                            _v.copy(p.dir).multiplyScalar(1.1 + burstF * p.speed * 0.42);
+                            _v.y -= (burstF * burstF) * 0.08; 
+                            p.mesh.position.copy(_v);
+                            p.mesh.rotation.set(p.rotSpeed.x*time, p.rotSpeed.y*time, p.rotSpeed.z*time);
+                        }
+                    }
+                }
+
+                // Update Orange (Burst mapped 0.6 to 0.8)
+                if (orangeGroup.visible) {
+                    let bProgO = 0;
+                    if (scrollProgress > 0.60) bProgO = Math.min(1, (scrollProgress - 0.60) * 5);
+                    let burstFO = Math.pow(bProgO, BURST_EXPONENT) * 5.8;
+                    if (prefersReducedMotion) burstFO *= 0.5;
+
+                    if (!prefersReducedMotion) {
+                        orangeGroup.position.x = mouseX * 0.35;
+                        orangeGroup.position.y = floatOffset + mouseY * 0.35;
+                        orangeGroup.rotation.y = time * 0.3 + mouseX * 0.7;
+                        orangeGroup.rotation.x = Math.sin(time*0.7)*0.08 - mouseY*0.5;
+                    }
+                    for (let w = 0; w < NUM_WEDGES_O; w++) {
+                        const wedge = wedgesO[w];
+                        wedge.mesh.position.copy(wedge.burstDir).multiplyScalar(burstFO);
+                        wedge.mesh.rotation.set(wedge.rotAxis.x*bProgO*3.2, wedge.rotAxis.y*bProgO*3.2, wedge.rotAxis.z*bProgO*3.2);
+                    }
+                    for (let i = 0; i < particlesO.length; i++) {
+                        const p = particlesO[i];
+                        if (bProgO < 0.03) p.mesh.visible = false;
+                        else {
+                            p.mesh.visible = true;
+                            _v.copy(p.dir).multiplyScalar(1.1 + burstFO * p.speed * 0.42);
+                            _v.y -= (burstFO * burstFO) * 0.08; 
+                            p.mesh.position.copy(_v);
+                            p.mesh.rotation.set(p.rotSpeed.x*time, p.rotSpeed.y*time, p.rotSpeed.z*time);
+                        }
+                    }
+                }
+
+                // UI Fades
+                if (overlay) overlay.style.opacity = scrollProgress > 0.05 ? '0' : '1';
+                
+                if (wp) {
+                    wp.style.opacity = (scrollProgress > 0.02 || scrollProgress < 0.001 || scrollProgress > 0.2) ? 0 : 1;
+                    wp.style.transform = scrollProgress > 0.02 ? 'translate(-50%, 20px)' : 'translate(-50%, 0)';
+                }
+
+                // Giant Name Reveal (0.15 to 0.30)
+                if (mkGiant) {
+                    let mkAlpha = 0; let mkScale = 0.9;
+                    if (scrollProgress >= 0.15 && scrollProgress <= 0.30) {
+                        if (scrollProgress < 0.20) mkAlpha = (scrollProgress - 0.15) * 20;
+                        else if (scrollProgress > 0.25) mkAlpha = 1 - (scrollProgress - 0.25) * 20;
+                        else mkAlpha = 1;
+                        mkScale = 0.9 + (scrollProgress - 0.15) * 1.0; 
+                    }
+                    mkGiant.style.opacity = Math.max(0, Math.min(1, mkAlpha));
+                    mkGiant.style.transform = `scale(${mkScale})`;
+                }
+
+                // Profile Section (0.25 to 0.55)
+                if (profSec) {
+                    let pAlpha = 0;
+                    if (scrollProgress >= 0.25 && scrollProgress <= 0.55) {
+                        if (scrollProgress < 0.30) pAlpha = (scrollProgress - 0.25) * 20;
+                        else if (scrollProgress > 0.50) pAlpha = 1 - (scrollProgress - 0.50) * 20;
+                        else pAlpha = 1;
+                    }
+                    profSec.style.opacity = Math.max(0, Math.min(1, pAlpha));
+                    profSec.style.pointerEvents = pAlpha > 0.5 ? 'auto' : 'none';
+                }
+
+                // Orange Background & Prompt (0.50 to 0.90)
+                if (orgBg) {
+                    let obgAlpha = 0;
+                    if (scrollProgress > 0.50 && scrollProgress < 0.90) {
+                        if (scrollProgress < 0.55) obgAlpha = (scrollProgress - 0.50) * 20;
+                        else if (scrollProgress > 0.85) obgAlpha = 1 - (scrollProgress - 0.85) * 20;
+                        else obgAlpha = 1;
+                    }
+                    orgBg.style.opacity = Math.max(0, Math.min(1, obgAlpha));
+                }
+                if (op) {
+                    if (scrollProgress > 0.55 && scrollProgress < 0.65) {
+                        op.style.opacity = 1; op.style.transform = 'translate(-50%, 0)';
+                    } else {
+                        op.style.opacity = 0; op.style.transform = 'translate(-50%, 20px)';
+                    }
+                }
+
+                // Cinematic Full Screen Video (0.70 to 0.88)
+                if (cinVideo) {
+                    let cvAlpha = 0;
+                    let vidScale = 1;
+                    if (scrollProgress >= 0.70 && scrollProgress <= 0.88) {
+                        if (scrollProgress < 0.75) cvAlpha = (scrollProgress - 0.70) * 20;
+                        else if (scrollProgress > 0.85) cvAlpha = 1 - (scrollProgress - 0.85) * 33.3;
+                        else cvAlpha = 1;
+                        vidScale = 1 + (scrollProgress - 0.70) * 0.3; // Gentle slow zoom effect
+                    }
+                    cinVideo.style.opacity = Math.max(0, Math.min(1, cvAlpha));
+                    
+                    const videoEl = cinVideo.querySelector('video');
+                    if (videoEl) {
+                        videoEl.style.transform = `scale(${vidScale})`;
+                    }
+                }
+
+                // THE END (0.85+)
+                if (theEnd) {
+                    theEnd.style.opacity = scrollProgress > 0.85 ? Math.min(1, (scrollProgress - 0.85) * 10) : 0;
+                }
+                
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+
+        })();
+    </script>
+</body>
+</html>
